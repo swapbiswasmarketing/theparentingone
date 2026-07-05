@@ -1,0 +1,176 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post, posts },
+  }));
+}
+
+const { post, posts } = Astro.props;
+const { Content } = await render(post);
+
+const stageLabels: Record<string, string> = {
+  all: "For every stage",
+  little: "🐣 The Little Years",
+  middle: "🪁 The Middle Years",
+  big: "🌙 The Big Years",
+};
+
+const more = posts
+  .filter((p) => p.id !== post.id)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 2);
+
+const siteUrl = Astro.site ?? new URL("https://raisekind.com");
+const articleLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  author: { "@type": "Organization", name: "Raise Kind" },
+  publisher: { "@type": "Organization", name: "Raise Kind" },
+  mainEntityOfPage: new URL(`/blog/${post.id}/`, siteUrl).href,
+};
+---
+
+<Layout title={`${post.data.title} — Raise Kind`} description={post.data.description}>
+  <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <div class="read-progress" aria-hidden="true"><span id="rp-bar"></span></div>
+  <button id="to-top" class="to-top" type="button" aria-label="Back to top" hidden>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <article class="post">
+    <div class="wrap-narrow">
+      <a href="/blog/" class="back">← All essays</a>
+      <p class="post-stage">{stageLabels[post.data.stage] ?? "For every stage"}</p>
+      <h1>{post.data.title}</h1>
+      <p class="post-dek">{post.data.description}</p>
+      <div class="post-byline">
+        <span class="avatar">🌱</span>
+        <div>
+          <strong>The Raise Kind team</strong>
+          <span>
+            {post.data.pubDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            {post.data.readingTime ? ` · ${post.data.readingTime}` : ""}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap-narrow prose">
+      <Content />
+    </div>
+
+    <div class="wrap-narrow">
+      <div class="post-cta">
+        <h3>Liked this? The Kind Note is where the good stuff lives.</h3>
+        <p>One small, doable idea for raising kinder humans — twice a month.</p>
+        <a href="/#kind-note" class="btn btn-primary">Get the Kind Note →</a>
+      </div>
+    </div>
+
+    {more.length > 0 && (
+      <div class="wrap keep-reading">
+        <p class="eyebrow">Keep reading</p>
+        <div class="more-grid">
+          {more.map((p) => (
+            <a href={`/blog/${p.id}/`} class="more-card">
+              <span class="more-emoji">{p.data.emoji}</span>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </article>
+</Layout>
+
+<style>
+  .post { padding-top: clamp(2rem, 5vw, 3.5rem); }
+  .back { display: inline-block; font-weight: 700; text-decoration: none; margin-bottom: 1.5rem; color: var(--ink-soft); }
+  .back:hover { color: var(--coral-deep); }
+  .post-stage { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage-deep); }
+  .post h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 0.5rem 0 0.8rem; }
+  .post-dek { font-size: 1.25rem; color: var(--ink-soft); font-family: var(--serif); font-style: italic; line-height: 1.4; }
+  .post-byline { display: flex; align-items: center; gap: 0.8rem; margin: 1.8rem 0; padding-bottom: 1.8rem; border-bottom: 1px solid var(--line); }
+  .avatar { width: 46px; height: 46px; display: grid; place-items: center; background: var(--paper-deep); border-radius: 50%; font-size: 1.4rem; }
+  .post-byline strong { display: block; font-size: 0.98rem; }
+  .post-byline span { color: var(--ink-faint); font-size: 0.9rem; }
+
+  /* Prose */
+  .prose { margin-top: 2rem; font-size: 1.15rem; line-height: 1.75; }
+  .prose :global(h2) { font-size: clamp(1.6rem, 3.5vw, 2.1rem); margin: 2.6rem 0 0.8rem; }
+  .prose :global(h3) { font-size: 1.35rem; margin: 2rem 0 0.6rem; }
+  .prose :global(p) { margin: 1.1rem 0; color: #4a3a34; }
+  .prose :global(ul), .prose :global(ol) { margin: 1.1rem 0 1.1rem 1.4rem; }
+  .prose :global(li) { margin: 0.5rem 0; }
+  .prose :global(strong) { color: var(--ink); }
+  .prose :global(a) { color: var(--coral-deep); }
+  .prose :global(blockquote) {
+    margin: 1.8rem 0; padding: 1.2rem 1.6rem; border-left: 5px solid var(--gold);
+    background: var(--paper-deep); border-radius: 0 var(--radius) var(--radius) 0;
+    font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--ink);
+  }
+  .prose :global(blockquote p) { color: var(--ink); margin: 0; }
+  .prose :global(hr) { border: none; border-top: 1px solid var(--line); margin: 2.5rem 0; }
+  .prose :global(code) { background: var(--paper-deep); padding: 0.15em 0.4em; border-radius: 6px; font-size: 0.9em; }
+
+  .post-cta {
+    margin: 3rem 0; padding: 2.2rem; background: var(--paper-deep);
+    border: 1px solid var(--line); border-radius: var(--radius-lg); text-align: center;
+  }
+  .post-cta h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .post-cta p { color: var(--ink-soft); margin-bottom: 1.3rem; }
+
+  .keep-reading { margin-top: 3.5rem; }
+  .more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-top: 1rem; }
+  .more-card {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.6rem; text-decoration: none; color: var(--ink); box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .more-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+  .more-emoji { font-size: 1.8rem; }
+  .more-card h3 { font-size: 1.25rem; margin: 0.4rem 0; }
+  .more-card p { color: var(--ink-soft); font-size: 0.95rem; }
+  @media (max-width: 720px) { .more-grid { grid-template-columns: 1fr; } }
+
+  /* Reading progress */
+  .read-progress { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: transparent; z-index: 90; }
+  .read-progress span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--coral), var(--gold)); transition: width 0.1s linear; }
+
+  /* Scroll to top */
+  .to-top { position: fixed; right: 1.4rem; bottom: 1.4rem; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--coral); color: #fff; border: none; cursor: pointer; box-shadow: var(--shadow-lift); z-index: 80; opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity 0.25s, transform 0.25s, background 0.15s; }
+  .to-top[hidden] { display: none; }
+  .to-top.show { opacity: 1; pointer-events: auto; transform: none; }
+  .to-top:hover { background: var(--coral-deep); }
+  .to-top svg { width: 20px; height: 20px; }
+</style>
+
+<script>
+  const bar = document.getElementById("rp-bar");
+  const toTop = document.getElementById("to-top");
+  const article = document.querySelector(".prose");
+  function onScroll() {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const height = doc.scrollHeight - doc.clientHeight;
+    const pct = height > 0 ? (scrollTop / height) * 100 : 0;
+    if (bar) bar.style.width = pct + "%";
+    if (toTop) {
+      const show = scrollTop > 600;
+      toTop.hidden = false;
+      toTop.classList.toggle("show", show);
+    }
+  }
+  if (toTop) toTop.hidden = true;
+  document.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+  toTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+</script>

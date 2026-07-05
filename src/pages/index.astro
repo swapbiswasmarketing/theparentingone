@@ -1,0 +1,347 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const featured = posts.slice(0, 3);
+
+const beliefs = [
+  {
+    n: "01",
+    title: "Kind is taught in the small moments",
+    body: "Not in the big lectures. In how you speak to the barista, how you repair after you snap, how you narrate a hard feeling. Kids learn kindness by watching it, on an ordinary Tuesday.",
+  },
+  {
+    n: "02",
+    title: "Connection before correction",
+    body: "A dysregulated kid can't learn a lesson. First we help them feel safe. Then, and only then, does the teaching land. Every single time.",
+  },
+  {
+    n: "03",
+    title: "Kind is not the same as nice",
+    body: "Nice is compliant. Kind is brave. We're not raising people-pleasers — we're raising humans who can hold a boundary and a warm heart at the same time.",
+  },
+  {
+    n: "04",
+    title: "You get to be a person too",
+    body: "Your needs aren't in the way of good parenting — they're part of it. A parent who models rest, repair, and self-respect is teaching the whole time.",
+  },
+];
+
+const stages = [
+  { key: "little", emoji: "🐣", name: "The Little Years", ages: "0–4", note: "Big feelings, tiny words. Sleep, tantrums, and the fierce love of the fog." },
+  { key: "middle", emoji: "🪁", name: "The Middle Years", ages: "5–11", note: "Friendships, fairness, and the first flickers of who they're becoming." },
+  { key: "big", emoji: "🌙", name: "The Big Years", ages: "12+", note: "Eye-rolls and open doors. Staying close while they pull away." },
+];
+
+const affirmations = [
+  "You are the exact parent your kid needs today.",
+  "Repair beats perfect, every time.",
+  "Kind kids come from kind-to-themselves parents.",
+  "The days are long. The kindness compounds.",
+  "You can hold a boundary and a hug at once.",
+];
+---
+
+<Layout>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="blobs" aria-hidden="true">
+      <span class="blob b1"></span>
+      <span class="blob b2"></span>
+      <span class="blob b3"></span>
+    </div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow reveal">A no-judgment field guide to the good stuff</p>
+      <h1 class="hero-title reveal">
+        Raise
+        <span class="mark">
+          kind
+          <svg class="under" viewBox="0 0 220 22" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M4 14 C 60 4, 160 4, 216 12" fill="none" stroke="#e6a742" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </span>
+        humans.
+      </h1>
+      <p class="hero-sub reveal">
+        Practical, tender, science-backed ideas for raising kind, brave, whole people —
+        from the newborn fog to the teenage eye-roll. No perfect parents here.
+        Just people trying, out loud.
+      </p>
+      <div class="hero-cta reveal">
+        <a href="/blog/" class="btn btn-primary">Start reading →</a>
+        <a href="#kind-note" class="btn btn-ghost">Get the Kind Note</a>
+      </div>
+      <p class="hero-meta reveal">🌱 Twice-a-month letter · 0 spam · 100% real talk</p>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- ============ MANIFESTO ============ -->
+  <section class="section beliefs-section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="eyebrow">What we believe</p>
+        <h2>Four quiet ideas that change everything.</h2>
+      </div>
+      <div class="beliefs">
+        {beliefs.map((b) => (
+          <article class="belief reveal">
+            <span class="belief-n">{b.n}</span>
+            <h3>{b.title}</h3>
+            <p>{b.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AGES ============ -->
+  <section class="section ages-section" id="ages">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="eyebrow">Start where you are</p>
+        <h2>Every stage is a whole new kid.</h2>
+        <p class="sec-lede">The needs change. The kindness doesn't. Find your season.</p>
+      </div>
+      <div class="stage-grid">
+        {stages.map((s) => (
+          <a href={`/blog/?stage=${s.key}`} class="stage-card reveal">
+            <span class="stage-emoji">{s.emoji}</span>
+            <div class="stage-ages">Ages {s.ages}</div>
+            <h3>{s.name}</h3>
+            <p>{s.note}</p>
+            <span class="stage-go">Explore →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED ESSAYS ============ -->
+  <section class="section essays-section">
+    <div class="wrap">
+      <div class="sec-head row reveal">
+        <div>
+          <p class="eyebrow">Fresh from the blog</p>
+          <h2>Essays worth your ten minutes.</h2>
+        </div>
+        <a href="/blog/" class="btn btn-ghost btn-sm">All essays →</a>
+      </div>
+      <div class="essay-grid">
+        {featured.map((post) => (
+          <a href={`/blog/${post.id}/`} class="essay-card reveal">
+            <span class="essay-emoji">{post.data.emoji}</span>
+            <h3>{post.data.title}</h3>
+            <p>{post.data.description}</p>
+            <span class="essay-meta">
+              {post.data.pubDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {post.data.readingTime ? ` · ${post.data.readingTime}` : ""}
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AFFIRMATION BAND ============ -->
+  <section class="affirm">
+    <div class="wrap">
+      <p class="eyebrow center">A small reminder</p>
+      <blockquote id="affirm-quote">{affirmations[0]}</blockquote>
+      <div class="affirm-dots" aria-hidden="true">
+        {affirmations.map((_, i) => <span class={i === 0 ? "on" : ""}></span>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEWSLETTER ============ -->
+  <section class="section kind-note" id="kind-note">
+    <div class="wrap-narrow note-card reveal">
+      <span class="note-badge">✉️ The Kind Note</span>
+      <h2>A gentle letter, twice a month.</h2>
+      <p>
+        One small, doable idea for raising kinder humans — plus the best thing we read that
+        fortnight. No guilt trips, no "sleep experts," no ads for things you don't need.
+      </p>
+      <form class="note-form" onsubmit="event.preventDefault(); this.querySelector('.note-ok').hidden=false; this.querySelector('input').value='';">
+        <input type="email" required placeholder="you@example.com" aria-label="Email address" />
+        <button type="submit" class="btn btn-primary">Send me the good stuff</button>
+        <p class="note-ok" hidden>🌱 You're in. Check your inbox for a warm hello.</p>
+      </form>
+      <p class="note-fine">Join 4,000+ parents raising kind on purpose. Unsubscribe anytime.</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: clamp(4rem, 12vw, 8rem) 0 clamp(3rem, 8vw, 5rem);
+    overflow: hidden;
+    text-align: center;
+  }
+  .blobs { position: absolute; inset: 0; z-index: 0; }
+  .blob {
+    position: absolute; border-radius: 50%;
+    filter: blur(48px); opacity: 0.55;
+    animation: float 18s ease-in-out infinite;
+  }
+  .b1 { width: 42vw; height: 42vw; left: -8vw; top: -6vw; background: #f6d9c9; }
+  .b2 { width: 34vw; height: 34vw; right: -6vw; top: 4vw; background: #cfe0c6; animation-delay: -6s; }
+  .b3 { width: 26vw; height: 26vw; left: 40vw; bottom: -10vw; background: #f7e2b5; animation-delay: -11s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(2vw, -3vw) scale(1.08); }
+    66% { transform: translate(-2vw, 2vw) scale(0.95); }
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; }
+  .eyebrow.center, .hero .eyebrow { display: inline-block; margin-bottom: 1.2rem; }
+  .hero-title {
+    font-size: clamp(3rem, 11vw, 7rem);
+    font-weight: 600;
+    line-height: 0.98;
+  }
+  .hero-title .mark { position: relative; color: var(--coral-deep); font-style: italic; white-space: nowrap; }
+  .hero-title .under {
+    position: absolute; left: -2%; bottom: -0.12em; width: 104%; height: 0.34em; z-index: -1;
+  }
+  .hero-sub {
+    font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+    color: var(--ink-soft);
+    max-width: 58ch; margin: 1.6rem auto 2rem;
+  }
+  .hero-cta { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+  .hero-meta { margin-top: 1.4rem; color: var(--ink-faint); font-size: 0.92rem; font-weight: 600; }
+  .scroll-hint {
+    position: absolute; bottom: 1.4rem; left: 50%; transform: translateX(-50%);
+    width: 26px; height: 42px; border: 2px solid var(--ink-faint); border-radius: 14px; z-index: 1;
+  }
+  .scroll-hint span {
+    display: block; width: 4px; height: 8px; background: var(--ink-faint);
+    border-radius: 2px; margin: 7px auto 0; animation: scrolldot 1.7s ease-in-out infinite;
+  }
+  @keyframes scrolldot { 0% { opacity: 0; transform: translateY(0); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
+
+  /* ---------- SECTION HEADS ---------- */
+  .sec-head { max-width: 640px; margin-bottom: 2.6rem; }
+  .sec-head h2 { font-size: clamp(1.9rem, 4.5vw, 3rem); margin-top: 0.6rem; }
+  .sec-head .sec-lede { color: var(--ink-soft); margin-top: 0.7rem; font-size: 1.1rem; }
+  .sec-head.row { display: flex; justify-content: space-between; align-items: flex-end; max-width: none; gap: 1rem; flex-wrap: wrap; }
+
+  /* ---------- BELIEFS ---------- */
+  .beliefs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
+  .belief {
+    background: var(--paper-2); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 1.9rem;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+  }
+  .belief::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+    background: linear-gradient(var(--coral), var(--gold));
+  }
+  .belief-n { font-family: var(--serif); font-size: 2.4rem; color: var(--blush); font-weight: 600; }
+  .belief h3 { font-size: 1.35rem; margin: 0.2rem 0 0.6rem; }
+  .belief p { color: var(--ink-soft); }
+  @media (max-width: 720px) { .beliefs { grid-template-columns: 1fr; } }
+
+  /* ---------- AGES ---------- */
+  .ages-section { background: var(--paper-deep); border-block: 1px solid var(--line); }
+  .stage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+  .stage-card {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 2rem 1.8rem; text-decoration: none; color: var(--ink);
+    display: flex; flex-direction: column; gap: 0.4rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+    box-shadow: var(--shadow);
+  }
+  .stage-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lift); border-color: var(--coral); }
+  .stage-emoji { font-size: 2.6rem; }
+  .stage-ages { font-weight: 800; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sage-deep); }
+  .stage-card h3 { font-size: 1.5rem; }
+  .stage-card p { color: var(--ink-soft); flex: 1; }
+  .stage-go { color: var(--coral-deep); font-weight: 800; margin-top: 0.6rem; }
+  @media (max-width: 820px) { .stage-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- ESSAYS ---------- */
+  .essay-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+  .essay-card {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.8rem; text-decoration: none; color: var(--ink);
+    display: flex; flex-direction: column; gap: 0.6rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--shadow);
+  }
+  .essay-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+  .essay-emoji { font-size: 2rem; }
+  .essay-card h3 { font-size: 1.28rem; line-height: 1.2; }
+  .essay-card p { color: var(--ink-soft); flex: 1; font-size: 0.98rem; }
+  .essay-meta { color: var(--ink-faint); font-size: 0.85rem; font-weight: 700; }
+  @media (max-width: 900px) { .essay-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- AFFIRMATION ---------- */
+  .affirm {
+    background: linear-gradient(120deg, var(--coral), var(--gold));
+    padding: clamp(3rem, 7vw, 5rem) 0; text-align: center; color: #fff;
+  }
+  .affirm .eyebrow { color: rgba(255,255,255,0.85); }
+  .affirm blockquote {
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: clamp(1.6rem, 4.5vw, 2.8rem); line-height: 1.2;
+    max-width: 20ch; margin: 1rem auto 1.4rem; color: #fff;
+    transition: opacity 0.4s ease;
+  }
+  .affirm-dots { display: flex; gap: 0.5rem; justify-content: center; }
+  .affirm-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.45); transition: background 0.3s; }
+  .affirm-dots span.on { background: #fff; }
+
+  /* ---------- KIND NOTE ---------- */
+  .note-card {
+    background: var(--ink); color: var(--paper); border-radius: var(--radius-lg);
+    padding: clamp(2.2rem, 5vw, 3.4rem); text-align: center; position: relative; overflow: hidden;
+  }
+  .note-card::after {
+    content: "🌱"; position: absolute; right: -1rem; bottom: -1.5rem; font-size: 8rem; opacity: 0.08;
+  }
+  .note-badge { display: inline-block; background: rgba(255,255,255,0.12); color: var(--paper); padding: 0.4rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.06em; }
+  .note-card h2 { color: var(--paper); font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 1rem 0 0.6rem; }
+  .note-card > p { color: color-mix(in srgb, var(--paper) 78%, transparent); max-width: 48ch; margin: 0 auto 1.6rem; }
+  .note-form { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+  .note-form input {
+    flex: 1; min-width: 240px; max-width: 320px; padding: 0.85rem 1.1rem; border-radius: 999px;
+    border: 2px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); color: #fff; font-size: 1rem;
+  }
+  .note-form input::placeholder { color: rgba(255,255,255,0.5); }
+  .note-form input:focus { outline: none; border-color: var(--gold); }
+  .note-ok { flex-basis: 100%; color: #ffd; font-weight: 700; margin-top: 0.4rem; }
+  .note-fine { color: color-mix(in srgb, var(--paper) 60%, transparent); font-size: 0.85rem; margin-top: 1.2rem; }
+  @media (max-width: 720px) { .note-form input { max-width: none; } }
+</style>
+
+<script>
+  // Rotating affirmations
+  const quotes = [
+    "You are the exact parent your kid needs today.",
+    "Repair beats perfect, every time.",
+    "Kind kids come from kind-to-themselves parents.",
+    "The days are long. The kindness compounds.",
+    "You can hold a boundary and a hug at once.",
+  ];
+  const el = document.getElementById("affirm-quote");
+  const dots = Array.from(document.querySelectorAll(".affirm-dots span"));
+  let i = 0;
+  if (el) {
+    setInterval(() => {
+      i = (i + 1) % quotes.length;
+      el.style.opacity = "0";
+      setTimeout(() => {
+        el.textContent = quotes[i];
+        el.style.opacity = "1";
+        dots.forEach((d, di) => d.classList.toggle("on", di === i));
+      }, 380);
+    }, 3800);
+  }
+</script>

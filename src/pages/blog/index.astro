@@ -1,0 +1,110 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const stageLabels: Record<string, string> = {
+  all: "Everything",
+  little: "🐣 Little (0–4)",
+  middle: "🪁 Middle (5–11)",
+  big: "🌙 Big (12+)",
+};
+---
+
+<Layout title="Essays — Raise Kind" description="Practical, tender essays on raising kind humans, from the newborn fog to the teenage eye-roll.">
+  <section class="blog-hero">
+    <div class="wrap">
+      <p class="eyebrow">The blog</p>
+      <h1>Essays on raising kind.</h1>
+      <p class="lede">Ten-minute reads for real parents. Filter by the season you're in.</p>
+      <div class="filters" role="tablist" aria-label="Filter essays by age stage">
+        {Object.entries(stageLabels).map(([key, label]) => (
+          <button class={`chip ${key === "all" ? "on" : ""}`} data-stage={key} type="button">{label}</button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section blog-list-section">
+    <div class="wrap">
+      <div class="post-grid" id="post-grid">
+        {posts.map((post) => (
+          <a href={`/blog/${post.id}/`} class="post-card" data-stage={post.data.stage}>
+            <span class="post-emoji">{post.data.emoji}</span>
+            <div class="post-body">
+              <span class="post-stage">{stageLabels[post.data.stage] ?? "Everything"}</span>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+              <span class="post-meta">
+                {post.data.pubDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                {post.data.readingTime ? ` · ${post.data.readingTime}` : ""}
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+      <p class="empty" id="empty" hidden>No essays in this season yet — but they're coming. 🌱</p>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .blog-hero { padding: clamp(3rem, 8vw, 5rem) 0 1rem; text-align: center; }
+  .blog-hero h1 { font-size: clamp(2.4rem, 7vw, 4.2rem); margin: 0.5rem 0; }
+  .blog-hero .lede { color: var(--ink-soft); font-size: 1.15rem; max-width: 46ch; margin: 0 auto 2rem; }
+  .filters { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+  .chip {
+    font-family: var(--sans); font-weight: 700; font-size: 0.9rem;
+    padding: 0.5rem 1.1rem; border-radius: 999px; cursor: pointer;
+    background: var(--paper-2); border: 1.5px solid var(--line); color: var(--ink-soft);
+    transition: all 0.16s ease;
+  }
+  .chip:hover { border-color: var(--coral); color: var(--ink); }
+  .chip.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .post-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.4rem; }
+  .post-card {
+    display: flex; gap: 1.2rem; align-items: flex-start;
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.6rem; text-decoration: none; color: var(--ink);
+    box-shadow: var(--shadow); transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .post-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
+  .post-emoji { font-size: 2.2rem; line-height: 1; }
+  .post-stage { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sage-deep); }
+  .post-card h2 { font-size: 1.4rem; margin: 0.35rem 0 0.5rem; line-height: 1.15; }
+  .post-card p { color: var(--ink-soft); font-size: 0.98rem; }
+  .post-meta { display: block; color: var(--ink-faint); font-size: 0.85rem; font-weight: 700; margin-top: 0.7rem; }
+  .empty { text-align: center; color: var(--ink-soft); font-size: 1.2rem; padding: 3rem 0; font-family: var(--serif); font-style: italic; }
+  @media (max-width: 820px) { .post-grid { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  function applyFilter(stage: string) {
+    const cards = document.querySelectorAll<HTMLElement>(".post-card");
+    let shown = 0;
+    cards.forEach((c) => {
+      const s = c.dataset.stage;
+      const show = stage === "all" || s === stage || s === "all";
+      c.style.display = show ? "" : "none";
+      if (show) shown++;
+    });
+    document.querySelectorAll(".chip").forEach((ch) =>
+      ch.classList.toggle("on", (ch as HTMLElement).dataset.stage === stage)
+    );
+    const empty = document.getElementById("empty");
+    if (empty) (empty as HTMLElement).hidden = shown !== 0;
+  }
+
+  document.querySelectorAll(".chip").forEach((ch) =>
+    ch.addEventListener("click", () => applyFilter((ch as HTMLElement).dataset.stage || "all"))
+  );
+
+  // Honor ?stage= from the homepage age cards
+  const params = new URLSearchParams(location.search);
+  const initial = params.get("stage");
+  if (initial) applyFilter(initial);
+</script>

@@ -1,0 +1,30 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Lost a little? — Raise Kind" description="That page wandered off. Let's get you back somewhere warm.">
+  <section class="nf">
+    <div class="wrap-narrow">
+      <div class="nf-emoji" aria-hidden="true">🧦</div>
+      <p class="eyebrow">Error 404 · Page not found</p>
+      <h1>This one wandered off.</h1>
+      <p class="nf-lede">
+        Like a single sock in the laundry, this page has vanished into the void.
+        It happens to the best of us. Let's get you back somewhere warm.
+      </p>
+      <div class="nf-cta">
+        <a href="/" class="btn btn-primary">Back home →</a>
+        <a href="/blog/" class="btn btn-ghost">Read an essay</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nf { text-align: center; padding: clamp(4rem, 12vw, 8rem) 0; }
+  .nf-emoji { font-size: clamp(4rem, 14vw, 7rem); animation: wobble 3s ease-in-out infinite; }
+  @keyframes wobble { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+  .nf h1 { font-size: clamp(2.4rem, 7vw, 4rem); margin: 0.6rem 0; }
+  .nf-lede { color: var(--ink-soft); font-size: 1.2rem; max-width: 44ch; margin: 0 auto 2rem; }
+  .nf-cta { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+</style>

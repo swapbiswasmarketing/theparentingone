@@ -1,0 +1,20 @@
+{
+  "name": "raisekind",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Raise Kind - raising kind humans, one small moment at a time.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "@resvg/resvg-js": "^2.6.2",
+    "astro": "^5.14.1"
+  }
+}
