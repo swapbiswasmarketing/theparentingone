@@ -4,20 +4,21 @@ import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
-  return posts.map((post) => ({
-    params: { slug: post.id },
-    props: { post, posts },
-  }));
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
 }
 
 const { post, posts } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 const stageLabels: Record<string, string> = {
   all: "For every stage",
   little: "🐣 The Little Years",
   middle: "🪁 The Middle Years",
   big: "🌙 The Big Years",
+};
+const sectionLabel: Record<string, string> = {
+  all: "Parenting", little: "The Little Years", middle: "The Middle Years", big: "The Big Years",
 };
 
 const more = posts
@@ -29,10 +30,13 @@ const siteUrl = Astro.site ?? new URL("https://raisekind.com");
 const url = new URL(`/blog/${post.id}/`, siteUrl).href;
 const published = post.data.pubDate.toISOString();
 const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
-const sectionLabel: Record<string, string> = {
-  all: "Parenting", little: "The Little Years", middle: "The Middle Years", big: "The Big Years",
-};
 const section = sectionLabel[post.data.stage] ?? "Parenting";
+
+const shareText = encodeURIComponent(post.data.title);
+const shareUrl = encodeURIComponent(url);
+const xShare = `https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}`;
+const fbShare = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+const liShare = `https://www.linkedin.com/sharing/share-offsite/?url=${shareUrl}`;
 
 const articleLd = {
   "@context": "https://schema.org",
@@ -56,6 +60,17 @@ const breadcrumbLd = {
     { "@type": "ListItem", position: 3, name: post.data.title, item: url },
   ],
 };
+const faqLd = post.data.faqs?.length
+  ? {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: post.data.faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    }
+  : null;
 ---
 
 <Layout
@@ -68,13 +83,18 @@ const breadcrumbLd = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
   <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} is:inline />
+  {faqLd && <script type="application/ld+json" set:html={JSON.stringify(faqLd)} is:inline />}
+
   <div class="read-progress" aria-hidden="true"><span id="rp-bar"></span></div>
   <button id="to-top" class="to-top" type="button" aria-label="Back to top" hidden>
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
+
   <article class="post">
     <div class="wrap-narrow">
-      <a href="/blog/" class="back">← All essays</a>
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a> <span>/</span> <a href="/blog/">Essays</a> <span>/</span> <span class="crumb-cur">{section}</span>
+      </nav>
       <p class="post-stage">{stageLabels[post.data.stage] ?? "For every stage"}</p>
       <h1>{post.data.title}</h1>
       <p class="post-dek">{post.data.description}</p>
@@ -84,15 +104,49 @@ const breadcrumbLd = {
           <strong>The Raise Kind team</strong>
           <span>
             {post.data.pubDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+            {post.data.updatedDate && ` · Updated ${post.data.updatedDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`}
             {post.data.readingTime ? ` · ${post.data.readingTime}` : ""}
           </span>
         </div>
       </div>
+
+      {toc.length >= 3 && (
+        <details class="toc" open>
+          <summary>In this essay</summary>
+          <ol>
+            {toc.map((h) => <li class={h.depth === 3 ? "sub" : ""}><a href={`#${h.slug}`}>{h.text}</a></li>)}
+          </ol>
+        </details>
+      )}
     </div>
 
     <div class="wrap-narrow prose">
       <Content />
     </div>
+
+    <div class="wrap-narrow">
+      <div class="share" aria-label="Share this essay">
+        <span class="share-label">Share</span>
+        <a class="share-btn" href={xShare} target="_blank" rel="noopener" aria-label="Share on X">X</a>
+        <a class="share-btn" href={fbShare} target="_blank" rel="noopener" aria-label="Share on Facebook">Facebook</a>
+        <a class="share-btn" href={liShare} target="_blank" rel="noopener" aria-label="Share on LinkedIn">LinkedIn</a>
+        <button class="share-btn copy-link" type="button" data-url={url}>Copy link</button>
+      </div>
+    </div>
+
+    {post.data.faqs?.length && (
+      <div class="wrap-narrow">
+        <section class="faq" aria-label="Frequently asked questions">
+          <h2>Common questions</h2>
+          {post.data.faqs.map((f) => (
+            <details class="faq-item">
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </section>
+      </div>
+    )}
 
     <div class="wrap-narrow">
       <div class="post-cta">
@@ -121,8 +175,10 @@ const breadcrumbLd = {
 
 <style>
   .post { padding-top: clamp(2rem, 5vw, 3.5rem); }
-  .back { display: inline-block; font-weight: 700; text-decoration: none; margin-bottom: 1.5rem; color: var(--ink-soft); }
-  .back:hover { color: var(--coral-deep); }
+  .crumbs { font-size: 0.85rem; color: var(--ink-faint); margin-bottom: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; font-weight: 600; }
+  .crumbs a { color: var(--ink-soft); text-decoration: none; }
+  .crumbs a:hover { color: var(--coral-deep); }
+  .crumb-cur { color: var(--sage-deep); }
   .post-stage { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage-deep); }
   .post h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 0.5rem 0 0.8rem; }
   .post-dek { font-size: 1.25rem; color: var(--ink-soft); font-family: var(--serif); font-style: italic; line-height: 1.4; }
@@ -131,49 +187,63 @@ const breadcrumbLd = {
   .post-byline strong { display: block; font-size: 0.98rem; }
   .post-byline span { color: var(--ink-faint); font-size: 0.9rem; }
 
-  /* Prose */
+  /* TOC */
+  .toc { margin: 1.6rem 0 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper-2); padding: 0.4rem 1.2rem; }
+  .toc summary { font-family: var(--sans); font-weight: 800; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sage-deep); cursor: pointer; padding: 0.7rem 0; list-style: none; }
+  .toc summary::-webkit-details-marker { display: none; }
+  .toc summary::after { content: "▾"; float: right; transition: transform 0.2s; }
+  .toc[open] summary::after { transform: rotate(180deg); }
+  .toc ol { margin: 0.2rem 0 1rem; padding-left: 1.1rem; }
+  .toc li { margin: 0.3rem 0; }
+  .toc li.sub { margin-left: 1rem; list-style: circle; }
+  .toc a { color: var(--ink-soft); text-decoration: none; font-size: 0.98rem; }
+  .toc a:hover { color: var(--coral-deep); text-decoration: underline; }
+
   .prose { margin-top: 2rem; font-size: 1.15rem; line-height: 1.75; }
-  .prose :global(h2) { font-size: clamp(1.6rem, 3.5vw, 2.1rem); margin: 2.6rem 0 0.8rem; }
-  .prose :global(h3) { font-size: 1.35rem; margin: 2rem 0 0.6rem; }
+  .prose :global(h2) { font-size: clamp(1.6rem, 3.5vw, 2.1rem); margin: 2.6rem 0 0.8rem; scroll-margin-top: 90px; }
+  .prose :global(h3) { font-size: 1.35rem; margin: 2rem 0 0.6rem; scroll-margin-top: 90px; }
   .prose :global(p) { margin: 1.1rem 0; color: #4a3a34; }
   .prose :global(ul), .prose :global(ol) { margin: 1.1rem 0 1.1rem 1.4rem; }
   .prose :global(li) { margin: 0.5rem 0; }
   .prose :global(strong) { color: var(--ink); }
   .prose :global(a) { color: var(--coral-deep); }
-  .prose :global(blockquote) {
-    margin: 1.8rem 0; padding: 1.2rem 1.6rem; border-left: 5px solid var(--gold);
-    background: var(--paper-deep); border-radius: 0 var(--radius) var(--radius) 0;
-    font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--ink);
-  }
+  .prose :global(blockquote) { margin: 1.8rem 0; padding: 1.2rem 1.6rem; border-left: 5px solid var(--gold); background: var(--paper-deep); border-radius: 0 var(--radius) var(--radius) 0; font-family: var(--serif); font-style: italic; font-size: 1.25rem; color: var(--ink); }
   .prose :global(blockquote p) { color: var(--ink); margin: 0; }
   .prose :global(hr) { border: none; border-top: 1px solid var(--line); margin: 2.5rem 0; }
   .prose :global(code) { background: var(--paper-deep); padding: 0.15em 0.4em; border-radius: 6px; font-size: 0.9em; }
 
-  .post-cta {
-    margin: 3rem 0; padding: 2.2rem; background: var(--paper-deep);
-    border: 1px solid var(--line); border-radius: var(--radius-lg); text-align: center;
-  }
+  /* Share */
+  .share { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 2.5rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+  .share-label { font-weight: 800; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-right: 0.2rem; }
+  .share-btn { font-family: var(--sans); font-weight: 700; font-size: 0.85rem; padding: 0.5rem 1rem; min-height: 40px; display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 999px; background: var(--paper-2); color: var(--ink); text-decoration: none; cursor: pointer; transition: all 0.15s; }
+  .share-btn:hover { border-color: var(--coral); color: var(--coral-deep); }
+  .copy-link.done { border-color: var(--sage); color: var(--sage-deep); }
+
+  /* FAQ */
+  .faq { margin: 3rem 0; }
+  .faq h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); margin-bottom: 1rem; }
+  .faq-item { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper-2); margin-bottom: 0.7rem; padding: 0 1.2rem; box-shadow: var(--shadow); }
+  .faq-item summary { font-family: var(--serif); font-weight: 600; font-size: 1.15rem; cursor: pointer; padding: 1.1rem 0; list-style: none; position: relative; padding-right: 2rem; color: var(--ink); }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: "+"; position: absolute; right: 0.2rem; top: 50%; transform: translateY(-50%); font-size: 1.5rem; color: var(--coral); }
+  .faq-item[open] summary::after { content: "−"; }
+  .faq-item p { color: var(--ink-soft); padding-bottom: 1.1rem; margin: 0; line-height: 1.7; }
+
+  .post-cta { margin: 3rem 0; padding: 2.2rem; background: var(--paper-deep); border: 1px solid var(--line); border-radius: var(--radius-lg); text-align: center; }
   .post-cta h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
   .post-cta p { color: var(--ink-soft); margin-bottom: 1.3rem; }
 
   .keep-reading { margin-top: 3.5rem; }
   .more-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; margin-top: 1rem; }
-  .more-card {
-    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 1.6rem; text-decoration: none; color: var(--ink); box-shadow: var(--shadow);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
+  .more-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; }
   .more-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lift); }
   .more-emoji { font-size: 1.8rem; }
   .more-card h3 { font-size: 1.25rem; margin: 0.4rem 0; }
   .more-card p { color: var(--ink-soft); font-size: 0.95rem; }
   @media (max-width: 720px) { .more-grid { grid-template-columns: 1fr; } }
 
-  /* Reading progress */
   .read-progress { position: fixed; top: 0; left: 0; right: 0; height: 4px; background: transparent; z-index: 90; }
   .read-progress span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--coral), var(--gold)); transition: width 0.1s linear; }
-
-  /* Scroll to top */
   .to-top { position: fixed; right: 1.4rem; bottom: 1.4rem; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--coral); color: #fff; border: none; cursor: pointer; box-shadow: var(--shadow-lift); z-index: 80; opacity: 0; pointer-events: none; transform: translateY(10px); transition: opacity 0.25s, transform 0.25s, background 0.15s; }
   .to-top[hidden] { display: none; }
   .to-top.show { opacity: 1; pointer-events: auto; transform: none; }
@@ -184,21 +254,26 @@ const breadcrumbLd = {
 <script>
   const bar = document.getElementById("rp-bar");
   const toTop = document.getElementById("to-top");
-  const article = document.querySelector(".prose");
   function onScroll() {
     const doc = document.documentElement;
-    const scrollTop = doc.scrollTop || document.body.scrollTop;
-    const height = doc.scrollHeight - doc.clientHeight;
-    const pct = height > 0 ? (scrollTop / height) * 100 : 0;
-    if (bar) bar.style.width = pct + "%";
-    if (toTop) {
-      const show = scrollTop > 600;
-      toTop.hidden = false;
-      toTop.classList.toggle("show", show);
-    }
+    const st = doc.scrollTop || document.body.scrollTop;
+    const h = doc.scrollHeight - doc.clientHeight;
+    if (bar) bar.style.width = (h > 0 ? (st / h) * 100 : 0) + "%";
+    if (toTop) { toTop.hidden = false; toTop.classList.toggle("show", st > 600); }
   }
   if (toTop) toTop.hidden = true;
   document.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
   toTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  const copyBtn = document.querySelector<HTMLButtonElement>(".copy-link");
+  copyBtn?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(copyBtn.dataset.url || location.href);
+      const prev = copyBtn.textContent;
+      copyBtn.textContent = "Copied ✓";
+      copyBtn.classList.add("done");
+      setTimeout(() => { copyBtn.textContent = prev; copyBtn.classList.remove("done"); }, 1800);
+    } catch (e) {}
+  });
 </script>
