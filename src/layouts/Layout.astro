@@ -5,12 +5,20 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  section?: string;
 }
 
 const {
-  title = "Raise Kind — raising kind humans, one small moment at a time",
-  description = "A warm, no-judgment corner of the internet about raising kind, brave, whole humans — from the newborn fog to the teenage eye-roll.",
+  title = "Raise Kind - raising kind humans, one small moment at a time",
+  description = "A warm, no-judgment corner of the internet about raising kind, brave, whole humans - from the newborn fog to the teenage eye-roll.",
   image = "/og.png",
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  section,
 } = Astro.props;
 
 const site = Astro.site ?? new URL("https://raisekind.com");
@@ -41,23 +49,34 @@ const jsonLd = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="author" content="Raise Kind" />
     <link rel="canonical" href={canonical} />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="Raise Kind" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Raise Kind - raising kind humans, one small moment at a time" />
+    {type === "article" && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {type === "article" && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {type === "article" && section && <meta property="article:section" content={section} />}
+    {type === "article" && <meta property="article:author" content="Raise Kind" />}
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="Raise Kind" />
 
     <meta name="theme-color" content="#fbf4ea" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#201a17" media="(prefers-color-scheme: dark)" />
@@ -129,7 +148,7 @@ const jsonLd = {
       <div class="wrap foot-grid">
         <div class="foot-brand">
           <span class="foot-logo">🌱 Raise Kind</span>
-          <p>Raising kind humans, one small moment at a time. No perfect parents here — just people trying, out loud.</p>
+          <p>Raising kind humans, one small moment at a time. No perfect parents here - just people trying, out loud.</p>
         </div>
         <div class="foot-col">
           <h4>Read</h4>

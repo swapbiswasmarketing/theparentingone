@@ -26,20 +26,48 @@ const more = posts
   .slice(0, 2);
 
 const siteUrl = Astro.site ?? new URL("https://raisekind.com");
+const url = new URL(`/blog/${post.id}/`, siteUrl).href;
+const published = post.data.pubDate.toISOString();
+const modified = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+const sectionLabel: Record<string, string> = {
+  all: "Parenting", little: "The Little Years", middle: "The Middle Years", big: "The Big Years",
+};
+const section = sectionLabel[post.data.stage] ?? "Parenting";
+
 const articleLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   headline: post.data.title,
   description: post.data.description,
-  datePublished: post.data.pubDate.toISOString(),
-  author: { "@type": "Organization", name: "Raise Kind" },
-  publisher: { "@type": "Organization", name: "Raise Kind" },
-  mainEntityOfPage: new URL(`/blog/${post.id}/`, siteUrl).href,
+  image: new URL("/og.png", siteUrl).href,
+  datePublished: published,
+  dateModified: modified,
+  articleSection: section,
+  author: { "@type": "Organization", name: "Raise Kind", url: siteUrl.href },
+  publisher: { "@type": "Organization", name: "Raise Kind", logo: { "@type": "ImageObject", url: new URL("/og.png", siteUrl).href } },
+  mainEntityOfPage: { "@type": "WebPage", "@id": url },
+};
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: siteUrl.href },
+    { "@type": "ListItem", position: 2, name: "Essays", item: new URL("/blog/", siteUrl).href },
+    { "@type": "ListItem", position: 3, name: post.data.title, item: url },
+  ],
 };
 ---
 
-<Layout title={`${post.data.title} — Raise Kind`} description={post.data.description}>
+<Layout
+  title={`${post.data.title} · Raise Kind`}
+  description={post.data.description}
+  type="article"
+  publishedTime={published}
+  modifiedTime={modified}
+  section={section}
+>
   <script type="application/ld+json" set:html={JSON.stringify(articleLd)} is:inline />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbLd)} is:inline />
   <div class="read-progress" aria-hidden="true"><span id="rp-bar"></span></div>
   <button id="to-top" class="to-top" type="button" aria-label="Back to top" hidden>
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -69,7 +97,7 @@ const articleLd = {
     <div class="wrap-narrow">
       <div class="post-cta">
         <h3>Liked this? The Kind Note is where the good stuff lives.</h3>
-        <p>One small, doable idea for raising kinder humans — twice a month.</p>
+        <p>One small, doable idea for raising kinder humans - twice a month.</p>
         <a href="/#kind-note" class="btn btn-primary">Get the Kind Note →</a>
       </div>
     </div>

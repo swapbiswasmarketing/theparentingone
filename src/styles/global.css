@@ -1,5 +1,5 @@
 /* ============================================================
-   Raise Kind — design system
+   Raise Kind - design system
    Warm, editorial, hopeful. Paper + coral + sage + gold.
    ============================================================ */
 
@@ -33,7 +33,7 @@
   color-scheme: light;
 }
 
-/* Warm dark mode — espresso, not cold */
+/* Warm dark mode - espresso, not cold */
 [data-theme="dark"] {
   --paper: #201a17;
   --paper-2: #292019;

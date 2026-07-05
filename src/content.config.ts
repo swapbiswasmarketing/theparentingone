@@ -7,6 +7,7 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
     stage: z.enum(["little", "middle", "big", "all"]).default("all"),
     readingTime: z.string().optional(),
     emoji: z.string().default("🌱"),
