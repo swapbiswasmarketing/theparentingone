@@ -6,6 +6,13 @@ stage: "all"
 readingTime: "7 min read"
 emoji: "🤍"
 featured: true
+faqs:
+  - q: "What is the difference between kind and nice?"
+    a: "Nice is about being liked and avoiding conflict, so it is often just compliance. Kind is about genuine care, which sometimes takes courage and includes healthy boundaries."
+  - q: "Why shouldn't I just teach my child to be nice?"
+    a: "Over-rewarding niceness can train kids to please others at their own expense, which fuels anxiety and difficulty saying no. Real kindness includes respecting themselves."
+  - q: "How do I raise a kind child instead of just a nice one?"
+    a: "Praise courage over compliance, let them say no to you within reason, separate apologies from forced feelings, and model brave, honest kindness yourself."
 ---
 
 We say we want to raise kind kids. But listen to what we actually praise, out loud, all day long:

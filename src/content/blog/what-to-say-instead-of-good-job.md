@@ -6,6 +6,13 @@ stage: "middle"
 readingTime: "5 min read"
 emoji: "🪁"
 featured: true
+faqs:
+  - q: "Why should I stop saying \"good job\"?"
+    a: "It is not harmful, just vague and so frequent that kids tune it out. Specific, observational praise builds real confidence and a growth mindset far better."
+  - q: "What can I say instead of \"good job\"?"
+    a: "Describe what you see: \"You used so much red here,\" or \"You stuck with that tricky part.\" Let the child draw their own proud conclusion."
+  - q: "Is praising kids bad?"
+    a: "No. The goal is to praise effort, choices, and specifics rather than generic outcomes or fixed labels like \"smart,\" which can make kids avoid challenges."
 ---
 
 Count how many times you said "good job" yesterday. If you're anything like me, it was somewhere north of forty, and roughly thirty-eight of them were on autopilot while you were also loading the dishwasher.

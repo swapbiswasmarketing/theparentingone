@@ -4,6 +4,6 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build
 export default defineConfig({
-  site: 'https://raisekind.com',
+  site: 'https://www.raisekind.com',
   integrations: [sitemap()],
 });

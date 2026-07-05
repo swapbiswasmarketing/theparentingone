@@ -6,6 +6,15 @@ stage: "little"
 readingTime: "6 min read"
 emoji: "🐣"
 featured: true
+faqs:
+  - q: "What is the best thing to say during a toddler tantrum?"
+    a: "A simple, steady \"I'm here\" often works better than reasoning or commands. It signals safety and connection, which a flooded child needs before they can calm down."
+  - q: "Why doesn't logic work during a tantrum?"
+    a: "When a child is in full meltdown, the thinking part of the brain is essentially offline and survival mode is running the show. They cannot process reasoning until they feel safe again."
+  - q: "What is co-regulation?"
+    a: "Co-regulation is lending your child your calm until their own nervous system can catch up. Your steady, warm presence helps settle their overwhelmed one."
+  - q: "Should I try to stop the tantrum?"
+    a: "Your job is not to stop the feeling but to accompany it. Staying calm and present helps the wave pass, while trying to shut it down usually makes it bigger."
 ---
 
 It's 6:14pm. The pasta is the wrong shape. Your three-year-old is now face-down on the kitchen floor, howling like the pasta has personally betrayed them.
