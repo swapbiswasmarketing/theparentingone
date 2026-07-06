@@ -63,6 +63,7 @@ body, .site-head, .stage-card, .essay-card, .belief, .post-card, .more-card, .pr
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {

@@ -8,9 +8,9 @@ const posts = (await getCollection("blog")).sort(
 
 const stageLabels: Record<string, string> = {
   all: "Everything",
-  little: "🐣 Little (0–4)",
-  middle: "🪁 Middle (5–11)",
-  big: "🌙 Big (12+)",
+  little: "Little (0-4)",
+  middle: "Middle (5-11)",
+  big: "Big (12+)",
 };
 ---
 
@@ -33,7 +33,6 @@ const stageLabels: Record<string, string> = {
       <div class="post-grid" id="post-grid">
         {posts.map((post) => (
           <a href={`/blog/${post.id}/`} class="post-card" data-stage={post.data.stage}>
-            <span class="post-emoji">{post.data.emoji}</span>
             <div class="post-body">
               <span class="post-stage">{stageLabels[post.data.stage] ?? "Everything"}</span>
               <h2>{post.data.title}</h2>
@@ -46,7 +45,7 @@ const stageLabels: Record<string, string> = {
           </a>
         ))}
       </div>
-      <p class="empty" id="empty" hidden>No essays in this season yet - but they're coming. 🌱</p>
+      <p class="empty" id="empty" hidden>No essays in this season yet, but they're coming soon.</p>
     </div>
   </section>
 </Layout>

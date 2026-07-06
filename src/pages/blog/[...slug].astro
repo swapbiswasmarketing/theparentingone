@@ -13,9 +13,9 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 const stageLabels: Record<string, string> = {
   all: "For every stage",
-  little: "🐣 The Little Years",
-  middle: "🪁 The Middle Years",
-  big: "🌙 The Big Years",
+  little: "The Little Years",
+  middle: "The Middle Years",
+  big: "The Big Years",
 };
 const sectionLabel: Record<string, string> = {
   all: "Parenting", little: "The Little Years", middle: "The Middle Years", big: "The Big Years",
@@ -99,7 +99,7 @@ const faqLd = post.data.faqs?.length
       <h1>{post.data.title}</h1>
       <p class="post-dek">{post.data.description}</p>
       <div class="post-byline">
-        <span class="avatar">🌱</span>
+        <span class="avatar">RK</span>
         <div>
           <strong>The Raise Kind team</strong>
           <span>
@@ -162,7 +162,6 @@ const faqLd = post.data.faqs?.length
         <div class="more-grid">
           {more.map((p) => (
             <a href={`/blog/${p.id}/`} class="more-card">
-              <span class="more-emoji">{p.data.emoji}</span>
               <h3>{p.data.title}</h3>
               <p>{p.data.description}</p>
             </a>
@@ -183,7 +182,7 @@ const faqLd = post.data.faqs?.length
   .post h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 0.5rem 0 0.8rem; }
   .post-dek { font-size: 1.25rem; color: var(--ink-soft); font-family: var(--serif); font-style: italic; line-height: 1.4; }
   .post-byline { display: flex; align-items: center; gap: 0.8rem; margin: 1.8rem 0; padding-bottom: 1.8rem; border-bottom: 1px solid var(--line); }
-  .avatar { width: 46px; height: 46px; display: grid; place-items: center; background: var(--paper-deep); border-radius: 50%; font-size: 1.4rem; }
+  .avatar { width: 46px; height: 46px; display: grid; place-items: center; background: var(--sage); color: #fff; border-radius: 50%; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.02em; }
   .post-byline strong { display: block; font-size: 0.98rem; }
   .post-byline span { color: var(--ink-faint); font-size: 0.9rem; }
 

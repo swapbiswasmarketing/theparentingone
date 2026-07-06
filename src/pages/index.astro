@@ -31,9 +31,9 @@ const beliefs = [
 ];
 
 const stages = [
-  { key: "little", emoji: "🐣", name: "The Little Years", ages: "0–4", note: "Big feelings, tiny words. Sleep, tantrums, and the fierce love of the fog." },
-  { key: "middle", emoji: "🪁", name: "The Middle Years", ages: "5–11", note: "Friendships, fairness, and the first flickers of who they're becoming." },
-  { key: "big", emoji: "🌙", name: "The Big Years", ages: "12+", note: "Eye-rolls and open doors. Staying close while they pull away." },
+  { key: "little", name: "The Little Years", ages: "0-4", note: "Big feelings, tiny words. Sleep, tantrums, and the fierce love of the fog." },
+  { key: "middle", name: "The Middle Years", ages: "5-11", note: "Friendships, fairness, and the first flickers of who they're becoming." },
+  { key: "big", name: "The Big Years", ages: "12+", note: "Eye-rolls and open doors. Staying close while they pull away." },
 ];
 
 const affirmations = [
@@ -48,11 +48,6 @@ const affirmations = [
 <Layout>
   <!-- ============ HERO ============ -->
   <section class="hero">
-    <div class="blobs" aria-hidden="true">
-      <span class="blob b1"></span>
-      <span class="blob b2"></span>
-      <span class="blob b3"></span>
-    </div>
     <div class="wrap hero-inner">
       <p class="eyebrow reveal">A no-judgment field guide to the good stuff</p>
       <h1 class="hero-title reveal">
@@ -74,7 +69,7 @@ const affirmations = [
         <a href="/blog/" class="btn btn-primary">Start reading →</a>
         <a href="#kind-note" class="btn btn-ghost">Get the Kind Note</a>
       </div>
-      <p class="hero-meta reveal">🌱 Twice-a-month letter · 0 spam · 100% real talk</p>
+      <p class="hero-meta reveal">Twice-a-month letter · 0 spam · 100% real talk</p>
     </div>
     <div class="scroll-hint" aria-hidden="true"><span></span></div>
   </section>
@@ -109,7 +104,6 @@ const affirmations = [
       <div class="stage-grid">
         {stages.map((s) => (
           <a href={`/blog/?stage=${s.key}`} class="stage-card reveal">
-            <span class="stage-emoji">{s.emoji}</span>
             <div class="stage-ages">Ages {s.ages}</div>
             <h3>{s.name}</h3>
             <p>{s.note}</p>
@@ -133,7 +127,6 @@ const affirmations = [
       <div class="essay-grid">
         {featured.map((post) => (
           <a href={`/blog/${post.id}/`} class="essay-card reveal">
-            <span class="essay-emoji">{post.data.emoji}</span>
             <h3>{post.data.title}</h3>
             <p>{post.data.description}</p>
             <span class="essay-meta">
@@ -169,7 +162,7 @@ const affirmations = [
       <form class="note-form" onsubmit="event.preventDefault(); this.querySelector('.note-ok').hidden=false; this.querySelector('input').value='';">
         <input type="email" required placeholder="you@example.com" aria-label="Email address" />
         <button type="submit" class="btn btn-primary">Send me the good stuff</button>
-        <p class="note-ok" hidden>🌱 You're in. Check your inbox for a warm hello.</p>
+        <p class="note-ok" hidden>You're in. Check your inbox for a warm hello.</p>
       </form>
       <p class="note-fine">Join 4,000+ parents raising kind on purpose. Unsubscribe anytime.</p>
     </div>
@@ -184,21 +177,8 @@ const affirmations = [
     overflow: hidden;
     text-align: center;
   }
-  .blobs { position: absolute; inset: 0; z-index: 0; }
-  .blob {
-    position: absolute; border-radius: 50%;
-    filter: blur(48px); opacity: 0.55;
-    animation: float 18s ease-in-out infinite;
-  }
-  .b1 { width: 42vw; height: 42vw; left: -8vw; top: -6vw; background: #f6d9c9; }
-  .b2 { width: 34vw; height: 34vw; right: -6vw; top: 4vw; background: #cfe0c6; animation-delay: -6s; }
-  .b3 { width: 26vw; height: 26vw; left: 40vw; bottom: -10vw; background: #f7e2b5; animation-delay: -11s; }
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(2vw, -3vw) scale(1.08); }
-    66% { transform: translate(-2vw, 2vw) scale(0.95); }
-  }
   .hero-inner { position: relative; z-index: 1; max-width: 900px; }
+  .hero::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--line); }
   .eyebrow.center, .hero .eyebrow { display: inline-block; margin-bottom: 1.2rem; }
   .hero-title {
     font-size: clamp(3rem, 11vw, 7rem);
@@ -304,7 +284,8 @@ const affirmations = [
     padding: clamp(2.2rem, 5vw, 3.4rem); text-align: center; position: relative; overflow: hidden;
   }
   .note-card::after {
-    content: "🌱"; position: absolute; right: -1rem; bottom: -1.5rem; font-size: 8rem; opacity: 0.08;
+    content: ""; position: absolute; right: -60px; bottom: -60px; width: 200px; height: 200px;
+    border-radius: 50%; border: 1px solid rgba(255,255,255,0.08);
   }
   .note-badge { display: inline-block; background: rgba(255,255,255,0.12); color: var(--paper); padding: 0.4rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.82rem; letter-spacing: 0.06em; }
   .note-card h2 { color: var(--paper); font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 1rem 0 0.6rem; }
